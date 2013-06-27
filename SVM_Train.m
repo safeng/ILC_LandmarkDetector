@@ -4,6 +4,13 @@ function SVMStruct = SVM_Train(Training,Group)
 % SVMStruct = SVM_Train(Training,Group) receives training data and
 % corresponding labels. Returns SVMStruct struct vectors for each landmark
 %
+% Output:
+% SVMStruct - cell array of svm structures
+%
+% Input:
+% Training - training data 
+% Group - labeling data
+% 
 % SEE ALSO:
 % PrepareTrainingData
 
