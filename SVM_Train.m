@@ -5,9 +5,19 @@ function SVMStruct = SVM_Train(Training,Group)
 % corresponding labels. Returns SVMStruct struct vectors for each landmark
 %
 % SEE ALSO:
-% PrepareTrainingData.m
+% PrepareTrainingData
 
 %% Check dimensionality of training data
-
-%% Traing linear svms for each landmark
-
+if ndims(Training)~=3
+    error('Internal error');
+end
+[M,~,K] = size(Training); % M/5 images, N is feature dimension, K is the number of svms to be trained
+if ~mod(M,5)
+    error('Incorrect number of positive & negative samples');
+end
+SVMStruct = cell(1,K);
+%% Train linear svms for each landmark
+for iMark = 1:K
+    svm = svmtrain(Training(:,:,iMark),Group);
+    SVMStruct{iMark} = svm;
+end
