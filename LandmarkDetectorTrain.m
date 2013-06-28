@@ -39,16 +39,35 @@ end
 SVMStruct = SVM_Train(Training, Group);
 
 %% Evaluate outputs of trained linear svms
-RealOutput = zeros(M,K); % M samples, K classifiers
+b = zeros(1,K); % intersect
+w = zeros(N,K); % weight
+outputReal = zeros(M,K); % floating-point output of linear svm
 for iMark = 1:K
     linearSVM = SVMStruct{iMark};
-    SupportVectors = linearSVM.SupportVectors; % suport vectors
+    b(iMark) = linearSVM.Bias;
+    SupportVectors = linearSVM.SupportVectors; % suport vectors (matrix)
     Alpha = linearSVM.Alpha; % weight of support vectors
-    ScaleData = linearSVM.ScaleData;
+    ScaleData = linearSVM.ScaleData; % struct of row vectors
+    shift = repmat(ScaleData.shift,M,1);
+    scaleFactor = repmat(ScaleData.scaleFactor,M,1);
+    % w is the weighted summation of support vectors
+    weight = Alpha*SupportVectors;
+    w(:,iMark) = weight.';
+    %% get floating-points values of linear svm output
+    % normalize data to zero mean and unit variance
+    normData = (Training(:,:,iMark)+shift).*scaleFactor; % M-by-N normalized data matrix
+    outputReal(:,iMark) = normData*weight + b(iMark); 
     
-    % test correctness of training
+    %% test correctness of training and computed real values
     labels = svmclassify(linearSVM,Training(:,:,iMark));
     missClass = sum(labels~=Group(:,iMark)); % number of misclassified samples
     fprintf(1, 'Error rate %g of %d svm\n', missClass/M, iMark);
+    % test computed real output
+    compLabels = outputReal>0;    
 end
+
 %% Logistic regression
+for iMark = 1:K
+    
+end
+   
