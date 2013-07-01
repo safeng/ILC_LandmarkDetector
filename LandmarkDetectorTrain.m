@@ -42,6 +42,7 @@ SVMStruct = SVM_Train(Training, Group);
 b = zeros(1,K); % intersect
 w = zeros(N,K); % weight
 outputReal = zeros(M,K); % floating-point output of linear svm
+compLabels = true(M,K);
 for iMark = 1:K
     linearSVM = SVMStruct{iMark};
     b(iMark) = linearSVM.Bias;
@@ -63,11 +64,21 @@ for iMark = 1:K
     missClass = sum(labels~=Group(:,iMark)); % number of misclassified samples
     fprintf(1, 'Error rate %g of %d svm\n', missClass/M, iMark);
     % test computed real output
-    compLabels = outputReal>0;    
+    compLabels(:,iMark) = outputReal>0;
+    groupIndex = 1:M;
+    fprintf(1,'Unmatched samples:\n_______________\n');
+    fprintf(1,'%d\n',groupIndex(compLabels(:,iMark)~=labels));
 end
 
 %% Logistic regression
+% generate weight factor. 4 for each positive sample, 1 for each negative
+% sample
+weight = ones(M,1);
+weight(1:5:M) = 4; % 1 positive sample : 4 negative samples
+theta = zeros(1,K);
+beta = zeros(1,K);
 for iMark = 1:K
-    
+    [t,be] = logistic(Training(:,:,iMark),compLabels(:,iMark),weight);
+    beta(iMark) = - be;
+    theta(iMark) = t;
 end
-   
