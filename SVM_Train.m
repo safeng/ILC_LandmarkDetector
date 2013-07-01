@@ -1,6 +1,6 @@
 function SVMStruct = SVM_Train(Training,Group)
-% SVM_TRAIN train severl linear SVMs based on the third dimension of
-% training.
+% SVM_TRAIN train several linear SVMs based on the third dimension of
+% training data.
 % SVMStruct = SVM_Train(Training,Group) receives training data and
 % corresponding labels. Returns SVMStruct struct vectors for each landmark
 %

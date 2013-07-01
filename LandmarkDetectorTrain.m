@@ -23,8 +23,8 @@ function [w, b, theta, beta] = LandmarkDetectorTrain(fileList,landmark,param)
 
 if vargin == 2
     % prepare a default param
-    param.DefaultFaceSize;
-    param.StdFaceSize;
+    param.DefaultFaceSize = [256, 256]; % size of face in training images
+    param.StdFaceSize = [40, 42]; % size of face mapped (used in detection)
     param.StdPatchSize = [11, 11];
     param.FeatureType = 'intensity';
 end
