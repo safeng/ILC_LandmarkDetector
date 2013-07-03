@@ -18,10 +18,13 @@ function [w, b, theta, beta] = LandmarkDetectorTrain(fileList,landmark,param)
 % landmark - annotions of facial landmarks
 % param - see PrepareTrainingData.m
 %
-% SEE ALSO:
-% PrepareTrainingData SVM_Train logistic
+% See also:
+% PrepareTrainingData.m     SVM_Train.m
+% logistic.m
 
-if vargin == 2
+%% check input
+narginchk(1,3);
+if nargin == 2
     % prepare a default param
     param.DefaultFaceSize = [256, 256]; % size of face in training images
     param.StdFaceSize = [40, 42]; % size of face mapped (used in detection)

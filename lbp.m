@@ -44,7 +44,7 @@ function result = lbp(varargin) % image,radius,neighbors,mapping,mode)
 
 
 % Check number of input arguments.
-error(nargchk(1,5,nargin));
+narginchk(1,5);
 
 image=varargin{1};
 d_image=double(image);
@@ -203,7 +203,9 @@ else
     elseif ((bins-1)<=intmax('uint16'))
         result=uint16(result);
     else
-        result=uint32(result);
+        if ~isfloat(image)
+            result=uint32(result);
+        end
     end
 end
 

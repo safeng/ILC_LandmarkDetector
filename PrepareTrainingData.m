@@ -25,6 +25,8 @@ function [Training, Group] = PrepareTrainingData(fileList,landmark,param)
 %      'StdPatchSize'       Size of patches on standard face
 %      'FeatureType'        Feature type string, could be 'intensity'
 %                           'LBP' or 'gradient'
+% See also:
+% lbp.m
 
 %% Check field validity
 TF = isfield(param,{'DefaultFaceSize','StdFaceSize','StdPatchSize','FeatureType'});
@@ -58,17 +60,31 @@ for idx = 1:M % idxth image
     % color image
     if ndims(image)==3
        image = rgb2hsv(image);
-       image = image(:,:,3); % extract intensity
+       image = image(:,:,3); % extract intensity channel
     end
+    image = double(image);
     %% Generate feature image from original gray-scale image
+    sp = [-1 -1; -1 0; -1 1; 0 -1; 0 1; 1 -1; 1 0; 1 1]; % neighbor loc relative to central pix
+    hx = [1;0;-1];hy = [1 0 -1]; % sobel edge filter
     if strcmp(param.FeatureType,'intensity')
         % do nothing
     elseif strcmp(param.FeatureType,'LBP')
+        % add padding border around image
+        image = padarray(image,[1 1]);
+        % generate LBP image with the following pattern
+        %   1   2   3
+        %   4   o   5
+        %   6   7   8
+        % 1 the lowest digit. 8 is the highest digit
+        image = lbp(image,sp,0,'i'); % lbp image
         
     elseif strcmp(param.FeatureType,'gradient')
+        imgx = imfilter(image,hx);
+        imgy = imfilter(image,hy);
+        image = imgx.^2 + imgy.^2; % use engergy terms as gradient image
         
     else
-        error('Known feature types');
+        error('Unknown feature types');
     end
     %% Extract features indexed by feature locations
     featLoc = landmark(idx,:); % corresponding K feature locations
