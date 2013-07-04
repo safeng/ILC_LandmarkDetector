@@ -26,22 +26,27 @@ function [w, b, theta, beta] = LandmarkDetectorTrain(fileList,landmark,param)
 narginchk(1,3);
 if nargin == 2
     % prepare a default param
-    param.DefaultFaceSize = [256, 256]; % size of face in training images
+    warning('LandmarkDetectorTrain:missingParam',...
+    'Missing size info use the default ones\n');
+    param.DefaultFaceSize = [128, 128]; % size of face in training images
     param.StdFaceSize = [40, 42]; % size of face mapped (used in detection)
     param.StdPatchSize = [11, 11];
     param.FeatureType = 'intensity';
 end
     
 %% Prepare training samples
+fprintf('Prepare training data...\n');
 [Training, Group] = PrepareTrainingData(fileList, landmark, param);
 % M - number of samples per training set, N - feature dimension, K - number
 % of landmarks
 [M,N,K] = size(Training);
 
 %% Train linear svms
+disp('Train linear svms...')
 SVMStruct = SVM_Train(Training, Group);
 
 %% Evaluate outputs of trained linear svms
+disp('Evaluate trained results...')
 b = zeros(1,K); % intersect
 w = zeros(N,K); % weight
 outputReal = zeros(M,K); % floating-point output of linear svm
@@ -76,6 +81,7 @@ end
 %% Logistic regression
 % generate weight factor. 4 for each positive sample, 1 for each negative
 % sample
+disp('Perform logistic regression...');
 weight = ones(M,1);
 weight(1:5:M) = 4; % 1 positive sample : 4 negative samples
 theta = zeros(1,K);

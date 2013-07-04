@@ -1,15 +1,27 @@
 % script file to combine whole process 
 % written by (C) Shuang Feng, in July 1st, 2013
-% load data. Suppose we haved loaded from text file
-load filename.mat;
-load landmark88.mat;
+% load data
+if exist('filename.mat','file')
+    load filename.mat;
+else
+    % load from .txt file
+    filename = importdata('filelist.txt');
+    save('filename.mat',filename);
+end
+if exist('landmark88.mat','file')
+    load landmark88.mat;
+else
+    % load from .txt file
+    landmark88 = importdata('landmark88.txt','file');
+    save('landmark88.mat',landmark88);
+end
 
 % invoke algorithm function
-param = struct('DefaultFaceSize',[256 256],...
-                'StdFaceSize',[40 42],... % set by the program
-                'StdPatchSize',[11 11],...
-                 'FeatureType', 'intensity');
-[w, b, theta, beta] = LandmarkDetectorTrain(filename,landmark88);
+param = struct('DefaultFaceSize',[128 128],...
+                'StdFaceSize',[40 42],...  % derived by the program
+                'StdPatchSize',[11 11],... % also
+                 'FeatureType', 'intensity'); % avail choices: intensity, LBP, gradient
+[w, b, theta, beta] = LandmarkDetectorTrain(filename,landmark88,param);
 
 % save result
 [N, K] = size(w); % N - feature dimension. K - number of classifiers
