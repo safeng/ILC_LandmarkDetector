@@ -26,5 +26,9 @@ SVMStruct = cell(1,K);
 %% Train linear svms for each landmark
 for iMark = 1:K
     SVMStruct{iMark} = svmtrain(Training(:,:,iMark),Group);
+    if iMark >1
+        fprintf(repmat('\b',1,4+1+length(complete)));
+    end
     fprintf('%4.1f%%complete.',iMark/K*100);
 end
+fprintf('\n');
