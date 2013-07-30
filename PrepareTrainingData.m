@@ -90,7 +90,7 @@ for idx = 1:M % idxth image
     featLoc = reshape(featLoc,2,K); % get K-by-2 matrix
     featLoc = featLoc';
     sampleIdx = 1+(idx-1)*5; % index of current positive sample
-    img2show = ones(size(image))*255; % img to show
+    img2show = ones(size(image))*255; % pos & neg samples on patches to show
     
     for iMark = 1:K % iMarkth feature
         % extract image patch centered at each landmark
@@ -108,37 +108,43 @@ for idx = 1:M % idxth image
         Group(sampleIdx) = true;
         
         %% Extract 4 negative samples around positive sample
-        % top left 
-        topLeft = round(feat2D - defaultPatchSize - patchHalfSize);
-        bottomRight = round(feat2D - patchHalfSize);
+        offsetRatio = 1; % distance between centers of neg & pos samples / size of sample
+        offsetDist = defaultPatchSize*offsetRatio; % 2D offset between pos & neg samples
+        % top left
+        topLeftCenter = round(feat2D - offsetDist);
+        topLeft = topLeftCenter - patchHalfSize;
+        bottomRight = topLeftCenter + patchHalfSize;
         featData = image(topLeft(2):bottomRight(2),topLeft(1):bottomRight(1));
         %img2show(topLeft(2):bottomRight(2),topLeft(1):bottomRight(1)) = featData;
         featData = imresize(featData, stdPatchSize);
-        Training(sampleIdx+1,:,iMark) = rand(size(featData(:))); % top left neg sample
+        Training(sampleIdx+1,:,iMark) = featData(:); % top left neg sample
         
         % top right
-        topLeft = round([feat2D(1)+patchHalfSize(1),feat2D(2)-defaultPatchSize(2)*1.5]);
-        bottomRight = round([feat2D(1)+defaultPatchSize(1)*1.5,feat2D(2)+patchHalfSize(2)]);
+        topRightCenter = round([feat2D(1)+offsetDist(1), feat2D(2)-offsetDist(2)]);
+        topLeft = topRightCenter - patchHalfSize;
+        bottomRight = topRightCenter + patchHalfSize;
         featData = image(topLeft(2):bottomRight(2),topLeft(1):bottomRight(1));
         %img2show(topLeft(2):bottomRight(2),topLeft(1):bottomRight(1)) = featData;
         featData = imresize(featData, stdPatchSize);
-        Training(sampleIdx+2,:,iMark) = rand(size(featData(:))); % top right neg sample
+        Training(sampleIdx+2,:,iMark) = featData(:); % top right neg sample
         
         % bottom left
-        topLeft = round([feat2D(1)-defaultPatchSize(1)*1.5,feat2D(2)+patchHalfSize(2)]);
-        bottomRight = round([feat2D(1)-patchHalfSize(1),feat2D(2)+defaultPatchSize(2)*1.5]);
+        bottomLeftCenter = round([feat2D(1)-offsetDist(1), feat2D(2)+offsetDist(2)]);
+        topLeft = bottomLeftCenter - patchHalfSize;
+        bottomRight = bottomLeftCenter + patchHalfSize;
         featData = image(topLeft(2):bottomRight(2),topLeft(1):bottomRight(1));
         %img2show(topLeft(2):bottomRight(2),topLeft(1):bottomRight(1)) = featData;
         featData = imresize(featData, stdPatchSize);
-        Training(sampleIdx+3,:,iMark) = rand(size(featData(:))); % bottom left neg sample
+        Training(sampleIdx+3,:,iMark) = featData(:); % bottom left neg sample
         
         % bottom right
-        topLeft = round(feat2D + patchHalfSize);
-        bottomRight = round(feat2D + defaultPatchSize + patchHalfSize);
+        bottomRightCenter = round(feat2D+offsetDist);
+        topLeft = bottomRightCenter - patchHalfSize;
+        bottomRight = bottomRightCenter + patchHalfSize;
         featData = image(topLeft(2):bottomRight(2),topLeft(1):bottomRight(1));
         %img2show(topLeft(2):bottomRight(2),topLeft(1):bottomRight(1)) = featData;
         featData = imresize(featData, stdPatchSize);
-        Training(sampleIdx+4,:,iMark) = rand(size(featData(:))); % bottom right neg sample
+        Training(sampleIdx+4,:,iMark) = featData(:); % bottom right neg sample
     end % for iMark of landmark
     % show image
 %     subplot(1,2,1);
